@@ -1,0 +1,20 @@
+name: Semgrep HTML Report
+on:
+  push:
+    branches: [main] 
+jobs:
+  semgrep_html:
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep scan
+        run: semgrep scan --config="p/default" . --json --output semgrep.json
+      - name: Generate HTML report
+        run: prospector-html --input semgrep.json --output semgrep-report.html --filter semgrep
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v6
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./semgrep-report.html

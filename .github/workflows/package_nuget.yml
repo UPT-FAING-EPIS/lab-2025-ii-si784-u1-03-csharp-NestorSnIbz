@@ -1,0 +1,30 @@
+name: Package NuGet
+on:
+  push:
+    branches: [main]
+jobs:
+  build-test-sonar-nuget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+      - name: Restore Dependencies
+        run: dotnet restore
+      - name: Run Tests
+        run: dotnet test --collect:"XPlat Code Coverage"
+      - name: Run SonarCloud Analysis
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          args: >
+            -Dsonar.organization=YOUR_ORG
+            -Dsonar.projectKey=YOUR_PROJECT
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+      - name: Pack NuGet
+        run: dotnet pack Bank.Domain/Bank.Domain.csproj -c Release -o ./nuget
+      - name: Publish NuGet Package
+        uses: nuget/setup-nuget@v1
+      - name: Push Package to GitHub
+        run: dotnet nuget push ./nuget/*.nupkg -k ${{ secrets.GITHUB_TOKEN }} -s https://nuget.pkg.github.com/YOUR_USERNAME/index.json
