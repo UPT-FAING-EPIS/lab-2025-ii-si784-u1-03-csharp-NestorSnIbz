@@ -16,13 +16,13 @@ jobs:
           python3 -m pip install semgrep prospector2html
 
       - name: Run Semgrep scan (JSON)
-        run: semgrep scan --config="p/default" . --json --output semgrep.json --exit-zero
+        run: semgrep scan --config="p/default" . --json --output semgrep.json --no-error
 
       - name: Generate HTML report
-        run: prospector-html --input semgrep.json --output semgrep-report --filter semgrep
+        run: python3 -m prospector.html --input semgrep.json --output semgrep-report --filter semgrep
 
       - name: Publish HTML report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4 
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./semgrep-report
