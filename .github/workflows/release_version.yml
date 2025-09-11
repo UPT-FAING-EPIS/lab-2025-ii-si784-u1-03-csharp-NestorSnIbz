@@ -2,20 +2,25 @@ name: Release Version
 on:
   push:
     tags:
-      - 'v*.*.*'  # cualquier tag que empiece con v
+      - 'v*.*.*'
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
+
       - name: Build Project
-        run: dotnet build -c Release
-      - name: Pack NuGet
-        run: dotnet pack Bank.Domain/Bank.Domain.csproj -c Release -o ./nuget
+        run: dotnet build -c Release Bank/Bank.sln
+
+      - name: Pack NuGet Package
+        run: dotnet pack Bank/Bank.Domain/Bank.Domain.csproj -c Release -o ./nuget
+
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:

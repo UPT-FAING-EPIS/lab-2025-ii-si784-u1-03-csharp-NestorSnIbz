@@ -1,34 +1,37 @@
-name: Semgrep HTML Report
-
+name: Package NuGet
 on:
   push:
     branches: [main]
 
 jobs:
-  semgrep_html:
+  package-nuget:
     runs-on: ubuntu-latest
-
     steps:
-      # 1️⃣ Clonar el repositorio
       - uses: actions/checkout@v4
 
-      # 2️⃣ Instalar Semgrep y prospector-html en el runner
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install semgrep prospector2html
-
-      # 3️⃣ Ejecutar Semgrep y generar JSON (ignorar exit code 1)
-      - name: Run Semgrep scan (JSON)
-        run: semgrep scan --config="p/default" . --json --output semgrep.json --exit-zero
-
-      # 4️⃣ Generar reporte HTML
-      - name: Generate HTML report
-        run: prospector-html --input semgrep.json --output semgrep-report --filter semgrep
-
-      # 5️⃣ Publicar HTML en GitHub Pages
-      - name: Publish HTML report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./semgrep-report
+          dotnet-version: '8.x'
+
+      - name: Restore dependencies
+        run: dotnet restore Bank/Bank.sln
+
+      - name: Run Unit Tests
+        run: dotnet test Bank/Bank.Domain.Tests/Bank.Domain.Tests.csproj --logger "trx;LogFileName=test-results.trx"
+
+      - name: SonarCloud Analysis
+        uses: sonarsource/sonarcloud-github-action@master
+        with:
+          projectKey: your_project_key
+          organization: your_org
+          token: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Pack NuGet package
+        run: dotnet pack Bank/Bank.Domain/Bank.Domain.csproj -c Release -o ./nuget
+
+      - name: Publish NuGet package to GitHub
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: ./nuget/*.nupkg
+          token: ${{ secrets.GITHUB_TOKEN }}
