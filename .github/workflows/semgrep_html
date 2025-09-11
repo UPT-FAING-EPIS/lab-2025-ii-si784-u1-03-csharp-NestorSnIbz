@@ -9,16 +9,20 @@ jobs:
     container:
       image: semgrep/semgrep
     steps:
+      # Clonar el repositorio
       - uses: actions/checkout@v4
 
+      # Ejecutar el escaneo Semgrep y generar JSON
       - name: Run Semgrep scan (JSON)
-        run: semgrep scan --config="p/default" . --json --output=semgrep.json
+        run: semgrep scan --config="p/default" . --json --output semgrep.json
 
+      # Generar reporte HTML en carpeta semgrep-report
       - name: Generate HTML report
-        run: prospector-html --input semgrep.json --output semgrep-report/ --filter semgrep
+        run: prospector-html --input semgrep.json --output semgrep-report --filter semgrep
 
+      # Publicar la carpeta en GitHub Pages
       - name: Publish HTML report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./semgrep-report/
+          publish_dir: semgrep-report
