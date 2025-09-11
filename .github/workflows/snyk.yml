@@ -9,31 +9,33 @@ jobs:
     container:
       image: semgrep/semgrep
     steps:
+      # Clonar el repositorio
       - uses: actions/checkout@v4
 
+      # Configurar Snyk (opcional, según tu configuración)
       - uses: snyk/actions/setup@master
 
-      # Ejecutar el escaneo Semgrep y generar SARIF
+      # Ejecutar Semgrep y generar SARIF
       - name: Semgrep scan (SARIF)
         run: semgrep scan --config="p/default" --sarif --output=report.sarif --metrics=off
 
-      # Subir el SARIF a GitHub Code Scanning
+      # Subir SARIF a GitHub Code Scanning
       - name: Upload SARIF result
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: report.sarif
 
-      # Ejecutar el escaneo Semgrep y generar JSON para HTML
+      # Ejecutar Semgrep y generar JSON para HTML
       - name: Semgrep scan (JSON)
         run: semgrep scan --config="p/default" . --json --output=semgrep.json
 
-      # Convertir JSON a HTML
+      # Convertir JSON a HTML (en una carpeta)
       - name: Generate HTML report
-        run: prospector-html --input semgrep.json --output semgrep-report.html --filter semgrep
+        run: prospector-html --input semgrep.json --output semgrep-report/ --filter semgrep
 
-      # Publicar el HTML en GitHub Pages
+      # Publicar HTML en GitHub Pages
       - name: Publish HTML report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v6
+        uses: peaceiris/actions-gh-pages@v5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./semgrep-report.html
+          publish_dir: ./semgrep-report/
