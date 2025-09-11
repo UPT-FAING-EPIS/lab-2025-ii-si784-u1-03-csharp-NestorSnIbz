@@ -10,25 +10,28 @@ jobs:
 
     steps:
       # 1️⃣ Clonar el repositorio
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      # 2️⃣ Instalar Semgrep y prospector-html en el runner
+      # 2️⃣ Instalar Semgrep y prospector-html
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip
-          python3 -m pip install semgrep prospector2html
+          pip install semgrep prospector2html
 
-      # 3️⃣ Ejecutar Semgrep y generar JSON (ignorar exit code 1)
-      - name: Run Semgrep scan (JSON)
-        run: semgrep scan --config="p/default" . --json --output semgrep.json || true
+      # 3️⃣ Ejecutar Semgrep y generar JSON (ignorar errores de Semgrep)
+      - name: Run Semgrep scan
+        run: semgrep scan --config "p/default" . --json --output semgrep.json || true
 
-      # 4️⃣ Generar reporte HTML
+      # 4️⃣ Generar reporte HTML desde el JSON de Semgrep
       - name: Generate HTML report
         run: prospector-html --input semgrep.json --output semgrep-report --filter semgrep
 
-      # 5️⃣ Publicar HTML en GitHub Pages
+      # 5️⃣ Publicar reporte HTML en GitHub Pages
       - name: Publish HTML report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./semgrep-report
+          # Opcional: limpiar el branch gh-pages antes de publicar
+          clean: true
