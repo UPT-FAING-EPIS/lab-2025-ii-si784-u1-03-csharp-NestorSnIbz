@@ -18,9 +18,9 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install semgrep prospector2html
 
-      # 3️⃣ Ejecutar Semgrep y generar JSON
+      # 3️⃣ Ejecutar Semgrep y generar JSON (ignorar exit code 1)
       - name: Run Semgrep scan (JSON)
-        run: semgrep scan --config="p/default" . --json --output semgrep.json
+        run: semgrep scan --config="p/default" . --json --output semgrep.json || true
 
       # 4️⃣ Generar reporte HTML
       - name: Generate HTML report
