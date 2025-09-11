@@ -16,10 +16,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build Project
-        run: dotnet build -c Release WebApi/Bank.WebApi.csproj
+        run: dotnet build -c Release Bank/WebApi/Bank.WebApi.csproj
 
       - name: Pack NuGet Package
-        run: dotnet pack WebApi/Bank.WebApi.csproj -c Release -o ./nuget
+        run: dotnet pack Bank/WebApi/Bank.WebApi.csproj -c Release -o ./nuget
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1

@@ -22,7 +22,7 @@ jobs:
         run: prospector-html --input semgrep.json --output semgrep-report --filter semgrep
 
       - name: Publish HTML report to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v5
+        uses: peaceiris/actions-gh-pages@v4 
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./semgrep-report
