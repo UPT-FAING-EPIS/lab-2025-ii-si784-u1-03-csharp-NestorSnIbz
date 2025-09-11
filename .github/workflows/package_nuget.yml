@@ -15,7 +15,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Restore dependencies
-        run: dotnet restore Bank/Bank.sln
+        run: dotnet restore Bank/Bank.Domain/Bank.Domain.csproj
 
       - name: Run Unit Tests
         run: dotnet test Bank/Bank.Domain.Tests/Bank.Domain.Tests.csproj --logger "trx;LogFileName=test-results.trx"
@@ -23,8 +23,8 @@ jobs:
       - name: SonarCloud Analysis
         uses: sonarsource/sonarcloud-github-action@master
         with:
-          projectKey: your_project_key
-          organization: your_org
+          projectKey: nestor123_nestor
+          organization: Nestor123
           token: ${{ secrets.SONAR_TOKEN }}
 
       - name: Pack NuGet package
