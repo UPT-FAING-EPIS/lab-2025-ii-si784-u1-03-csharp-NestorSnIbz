@@ -15,10 +15,10 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Restore dependencies
-        run: dotnet restore  # Sin ruta específica, restaura todos los proyectos
+        run: dotnet restore Bank/WebApi/Bank.WebApi.csproj
 
       - name: Run Unit Tests
-        run: dotnet test  # Ejecuta todos los tests
+        run: dotnet test Bank/WebApi.Tests/Bank.WebApi.Tests.csproj --logger "trx;LogFileName=test-results.trx"
 
       - name: SonarCloud Analysis
         uses: sonarsource/sonarcloud-github-action@master
@@ -28,7 +28,7 @@ jobs:
           token: ${{ secrets.SONAR_TOKEN }}
 
       - name: Pack NuGet package
-        run: dotnet pack -c Release -o ./nuget  # Empaqueta todos los proyectos packables
+        run: dotnet pack Bank/WebApi/Bank.WebApi.csproj -c Release -o ./nuget
 
       - name: Publish NuGet package to GitHub
         uses: ncipollo/release-action@v1
